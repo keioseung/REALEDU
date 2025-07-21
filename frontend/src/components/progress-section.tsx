@@ -6,7 +6,7 @@ import { BarChart3, TrendingUp, BookOpen, Target, Calendar, ChevronLeft, Chevron
 import { useUserStats } from '@/hooks/use-user-progress'
 import { userProgressAPI } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, DotProps } from 'recharts'
 
 
 interface ProgressSectionProps {
@@ -160,6 +160,44 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const maxAI = Math.max(...uniqueChartData.map((d: PeriodData) => d.ai_info), 1)
   const maxTerms = Math.max(...uniqueChartData.map((d: PeriodData) => d.terms), 1)
   const maxQuiz = Math.max(...uniqueChartData.map((d: PeriodData) => d.quiz_score), 1)
+
+  // 커스텀 툴팁
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.95)',
+          borderRadius: 16,
+          padding: '16px 20px',
+          boxShadow: '0 4px 24px 0 rgba(80,80,180,0.15)',
+          color: '#fff',
+          minWidth: 120,
+          fontWeight: 600,
+          fontSize: 15,
+          border: '1.5px solid #6366f1',
+        }}>
+          <div style={{marginBottom: 8, fontWeight: 700, color: '#a5b4fc'}}>{label}</div>
+          {payload.map((entry: any, idx: number) => (
+            <div key={idx} style={{display: 'flex', alignItems: 'center', marginBottom: 4}}>
+              <span style={{display: 'inline-block', width: 10, height: 10, borderRadius: 5, background: entry.color, marginRight: 8}}></span>
+              {entry.name}: <span style={{marginLeft: 6, fontWeight: 700}}>{entry.value}%</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+  // 커스텀 마커
+  const CustomDot = (props: DotProps & { color: string }) => {
+    const { cx, cy, color } = props;
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={8} fill={color} fillOpacity={0.18} />
+        <circle cx={cx} cy={cy} r={5} fill={color} stroke="#fff" strokeWidth={2} />
+      </g>
+    );
+  };
 
   return (
     <div className="space-y-8 relative">
@@ -464,25 +502,39 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
         </div>
         {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6" style={{ height: 320, minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="glass rounded-2xl p-6" style={{ height: 340, minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.12),rgba(236,72,153,0.10),rgba(16,185,129,0.10))' }}>
           {periodStats === undefined ? (
             <div className="text-center text-white/60 w-full">로딩 중...</div>
           ) : (
-            <div className="space-y-8 w-full" style={{ height: 320 }}>
+            <div className="w-full" style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart
+                <LineChart
                   data={percentChartData}
-                  margin={{ top: 20, right: 40, left: 0, bottom: 10 }}
+                  margin={{ top: 30, right: 40, left: 0, bottom: 10 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#fff2" />
-                  <XAxis dataKey="date" tick={{ fill: '#fff' }} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#fff' }} domain={[0, 100]} />
-                  <Tooltip contentStyle={{ background: '#222', border: 'none', color: '#fff' }} labelStyle={{ color: '#fff' }} />
-                  <Legend wrapperStyle={{ color: '#fff' }} />
-                  <Bar yAxisId="right" dataKey="ai_percent" name="AI 정보 학습(%)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  <Bar yAxisId="right" dataKey="terms_percent" name="용어 학습(%)" fill="#a855f7" radius={[4, 4, 0, 0]} />
-                  <Line yAxisId="right" type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#22c55e" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                </BarChart>
+                  <defs>
+                    <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9}/>
+                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0.2}/>
+                    </linearGradient>
+                    <linearGradient id="termsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ec4899" stopOpacity={0.9}/>
+                      <stop offset="100%" stopColor="#ec4899" stopOpacity={0.2}/>
+                    </linearGradient>
+                    <linearGradient id="quizGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.9}/>
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.2}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke="#fff2" vertical={false} />
+                  <XAxis dataKey="date" tick={{ fill: '#e0e7ff', fontWeight: 600 }} axisLine={{stroke:'#6366f1'}} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fill: '#e0e7ff', fontWeight: 600 }} axisLine={{stroke:'#6366f1'}} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend iconType="circle" wrapperStyle={{ color: '#fff', fontWeight: 700, fontSize: 15, padding: 8, borderRadius: 12, background: 'rgba(30,41,59,0.7)' }} />
+                  <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={4} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 10 }} fill="url(#aiGrad)" isAnimationActive animationDuration={1200} />
+                  <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={4} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 10 }} fill="url(#termsGrad)" isAnimationActive animationDuration={1200} />
+                  <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={4} dot={<CustomDot color="#10b981" />} activeDot={{ r: 10 }} fill="url(#quizGrad)" isAnimationActive animationDuration={1200} />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           )}
