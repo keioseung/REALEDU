@@ -7,6 +7,7 @@ import { useUserStats } from '@/hooks/use-user-progress'
 import { userProgressAPI } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, DotProps } from 'recharts'
+import { FaRobot, FaBookOpen, FaCheckCircle } from 'react-icons/fa';
 
 
 interface ProgressSectionProps {
@@ -224,6 +225,10 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   };
   // X축 라벨 미리 메모이제이션
   const xLabels = useMemo(() => percentChartData.map(d => formatDateLabel(d.date)), [percentChartData]);
+
+  // 오늘 데이터 추출
+  const todayData = percentChartData[percentChartData.length - 1] || { ai_percent: 0, terms_percent: 0, quiz_score: 0 };
+  const todayStats = uniqueChartData[uniqueChartData.length - 1] || { ai_info: 0, terms: 0, quiz_correct: 0, quiz_total: 0 };
 
   return (
     <div className="space-y-8 relative">
@@ -519,6 +524,31 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         </motion.div>
       </div>
 
+      {/* 인포 카드 섹션 */}
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8 mb-10 md:mb-14 justify-center items-stretch">
+        {/* AI 정보학습 카드 */}
+        <div className="flex-1 min-w-[220px] bg-gradient-to-br from-blue-500/30 to-blue-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center border border-blue-400/30">
+          <FaRobot className="w-10 h-10 text-blue-400 mb-2 drop-shadow" />
+          <div className="text-3xl md:text-4xl font-extrabold text-blue-200 mb-1">{todayStats.ai_info} / 3</div>
+          <div className="text-lg font-bold text-blue-100 mb-1">AI 정보 학습</div>
+          <div className="text-blue-300 text-base font-semibold">{todayData.ai_percent}% 달성</div>
+        </div>
+        {/* 용어학습 카드 */}
+        <div className="flex-1 min-w-[220px] bg-gradient-to-br from-pink-500/30 to-purple-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center border border-pink-400/30">
+          <FaBookOpen className="w-10 h-10 text-pink-400 mb-2 drop-shadow" />
+          <div className="text-3xl md:text-4xl font-extrabold text-pink-200 mb-1">{todayStats.terms} / 60</div>
+          <div className="text-lg font-bold text-pink-100 mb-1">용어 학습</div>
+          <div className="text-pink-300 text-base font-semibold">{todayData.terms_percent}% 달성</div>
+        </div>
+        {/* 퀴즈점수 카드 */}
+        <div className="flex-1 min-w-[220px] bg-gradient-to-br from-green-500/30 to-green-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center border border-green-400/30">
+          <FaCheckCircle className="w-10 h-10 text-green-400 mb-2 drop-shadow" />
+          <div className="text-3xl md:text-4xl font-extrabold text-green-200 mb-1">{todayStats.quiz_total > 0 ? `${todayStats.quiz_correct} / ${todayStats.quiz_total}` : '0 / 0'}</div>
+          <div className="text-lg font-bold text-green-100 mb-1">퀴즈 정답률</div>
+          <div className="text-green-300 text-base font-semibold">{todayData.quiz_score}% 달성</div>
+        </div>
+      </div>
+
       {/* 기간별 추이 그래프 */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -528,7 +558,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
         </div>
         {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6" style={{ height: 360, minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.16),rgba(236,72,153,0.13),rgba(16,185,129,0.13))', boxShadow: '0 8px 32px 0 rgba(31,41,55,0.18)' }}>
+        <div className="glass rounded-2xl p-6 mt-2 md:mt-6" style={{ height: 360, minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.16),rgba(236,72,153,0.13),rgba(16,185,129,0.13))', boxShadow: '0 8px 32px 0 rgba(31,41,55,0.18)' }}>
           {periodStats === undefined ? (
             <div className="text-center text-white/60 w-full">로딩 중...</div>
           ) : (
@@ -563,7 +593,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   <XAxis
                     dataKey="date"
                     tick={({ x, y, payload, index }) => (
-                      <g transform={`translate(${x},${y})`} key={payload.value}>
+                      <g transform={`translate(${x},${y})`} key={payload.value + '-' + index}>
                         <text
                           x={0}
                           y={0}
