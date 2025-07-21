@@ -447,82 +447,107 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         </div>
         {/* 개선된 그래프 컨테이너 */}
         <div className="glass rounded-2xl p-6" style={{ height: 320, minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {periodStats === undefined ? (
-            <div className="text-center text-white/60 w-full">로딩 중...</div>
-          ) : uniqueChartData.length > 0 ? (
-            <div className="space-y-8 w-full">
-              {/* 통합 라인 그래프 */}
-              <Line
-                data={{
-                  labels: uniqueChartData.map((d) => d.date),
-                  datasets: [
-                    {
-                      label: 'AI 정보 학습',
-                      data: uniqueChartData.map((d) => d.ai_info),
-                      backgroundColor: 'rgba(59,130,246,0.5)',
-                      borderColor: 'rgba(59,130,246,1)',
-                      borderWidth: 2,
-                      yAxisID: 'y',
-                    },
-                    {
-                      label: '용어 학습',
-                      data: uniqueChartData.map((d) => d.terms),
-                      backgroundColor: 'rgba(168,85,247,0.5)',
-                      borderColor: 'rgba(168,85,247,1)',
-                      borderWidth: 2,
-                      yAxisID: 'y',
-                    },
-                    {
-                      label: '퀴즈 점수(%)',
-                      data: uniqueChartData.map((d) => d.quiz_score),
-                      borderColor: 'rgba(34,197,94,1)',
-                      backgroundColor: 'rgba(34,197,94,0.2)',
-                      borderWidth: 2,
-                      tension: 0.3,
-                      yAxisID: 'y1',
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { labels: { color: '#fff' } },
-                    tooltip: { mode: 'index', intersect: false },
+          <div className="space-y-8 w-full">
+            <Line
+              data={{
+                labels: uniqueChartData.length > 0 ? uniqueChartData.map((d) => d.date) : Array(7).fill(''),
+                datasets: uniqueChartData.length > 0 ? [
+                  {
+                    label: 'AI 정보 학습',
+                    data: uniqueChartData.map((d) => d.ai_info),
+                    backgroundColor: 'rgba(59,130,246,0.5)',
+                    borderColor: 'rgba(59,130,246,1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
                   },
-                  scales: {
-                    x: {
-                      ticks: { color: '#fff' },
-                      grid: { color: 'rgba(255,255,255,0.1)' },
-                    },
-                    y: {
-                      type: 'linear',
-                      position: 'left',
-                      beginAtZero: true,
-                      title: { display: true, text: '학습 개수', color: '#fff' },
-                      ticks: { color: '#fff' },
-                      grid: { color: 'rgba(255,255,255,0.1)' },
-                    },
-                    y1: {
-                      type: 'linear',
-                      position: 'right',
-                      beginAtZero: true,
-                      min: 0,
-                      max: 100,
-                      title: { display: true, text: '퀴즈 점수(%)', color: '#fff' },
-                      ticks: { color: '#fff' },
-                      grid: { drawOnChartArea: false },
-                    },
+                  {
+                    label: '용어 학습',
+                    data: uniqueChartData.map((d) => d.terms),
+                    backgroundColor: 'rgba(168,85,247,0.5)',
+                    borderColor: 'rgba(168,85,247,1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
                   },
-                }}
-                height={320}
-              />
-            </div>
-          ) : (
-            <div className="text-center text-white/60 w-full flex flex-col items-center justify-center" style={{height: '100%'}}>
-              <BarChart3 className="w-12 h-12 mb-4 opacity-40" />
-              <p>선택한 기간에 학습 데이터가 없습니다.</p>
-            </div>
-          )}
+                  {
+                    label: '퀴즈 점수(%)',
+                    data: uniqueChartData.map((d) => d.quiz_score),
+                    borderColor: 'rgba(34,197,94,1)',
+                    backgroundColor: 'rgba(34,197,94,0.2)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                  },
+                ] : [
+                  {
+                    label: 'AI 정보 학습',
+                    data: Array(7).fill(0),
+                    backgroundColor: 'rgba(59,130,246,0.1)',
+                    borderColor: 'rgba(59,130,246,0.1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                  },
+                  {
+                    label: '용어 학습',
+                    data: Array(7).fill(0),
+                    backgroundColor: 'rgba(168,85,247,0.1)',
+                    borderColor: 'rgba(168,85,247,0.1)',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                  },
+                  {
+                    label: '퀴즈 점수(%)',
+                    data: Array(7).fill(0),
+                    borderColor: 'rgba(34,197,94,0.1)',
+                    backgroundColor: 'rgba(34,197,94,0.05)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    yAxisID: 'y1',
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { labels: { color: '#fff' } },
+                  tooltip: { mode: 'index', intersect: false },
+                },
+                scales: {
+                  x: {
+                    ticks: { color: '#fff' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                  },
+                  y: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    title: { display: true, text: '학습 개수', color: '#fff' },
+                    ticks: { color: '#fff' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                  },
+                  y1: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    min: 0,
+                    max: 100,
+                    title: { display: true, text: '퀴즈 점수(%)', color: '#fff' },
+                    ticks: { color: '#fff' },
+                    grid: { drawOnChartArea: false },
+                  },
+                },
+              }}
+              height={320}
+            />
+            {/* 안내 메시지 */}
+            {periodStats === undefined ? (
+              <div className="text-center text-white/60 w-full">로딩 중...</div>
+            ) : uniqueChartData.length === 0 && (
+              <div className="text-center text-white/60 w-full flex flex-col items-center justify-center" style={{height: '100%'}}>
+                <BarChart3 className="w-12 h-12 mb-4 opacity-40" />
+                <p>선택한 기간에 학습 데이터가 없습니다.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
