@@ -446,10 +446,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
         </div>
         {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6">
-          {uniqueChartData.length > 0 ? (
+        <div className="glass rounded-2xl p-6" style={{ minHeight: 320 }}>
+          {periodStats === undefined ? (
+            <div className="text-center text-white/60 py-8">로딩 중...</div>
+          ) : uniqueChartData.length > 0 ? (
             <div className="space-y-8">
-              {/* 통합 라인/바 그래프 */}
+              {/* 통합 라인 그래프 */}
               <Line
                 data={{
                   labels: uniqueChartData.map((d) => d.date),
