@@ -294,30 +294,6 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       </div>
 
-      {/* 상단 통계 카드 - 모바일 앱 유저 친화적 2x2 그리드, 카드형, 반응형 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-blue-500/30 to-blue-800/20 border-0 active:scale-95 transition-transform">
-          <BookOpen className="w-7 h-7 text-blue-300 mb-1" />
-          <div className="text-xl font-extrabold text-blue-100 mb-0.5">{filteredTerms.length}</div>
-          <div className="text-xs font-semibold text-blue-200">표시</div>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-yellow-400/30 to-green-400/20 border-0 active:scale-95 transition-transform">
-          <Star className="w-7 h-7 text-yellow-300 mb-1" />
-          <div className="text-xl font-extrabold text-yellow-100 mb-0.5">{favoriteTerms.size}</div>
-          <div className="text-xs font-semibold text-yellow-200">즐겨찾기</div>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-purple-500/30 to-pink-500/20 border-0 active:scale-95 transition-transform">
-          <Calendar className="w-7 h-7 text-purple-300 mb-1" />
-          <div className="text-xl font-extrabold text-purple-100 mb-0.5">{learnedData.learned_dates.length}</div>
-          <div className="text-xs font-semibold text-purple-200">일</div>
-        </div>
-        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-orange-400/30 to-yellow-400/20 border-0 active:scale-95 transition-transform">
-          <TrendingUp className="w-7 h-7 text-orange-300 mb-1" />
-          <div className="text-xl font-extrabold text-orange-100 mb-0.5">{Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%</div>
-          <div className="text-xs font-semibold text-orange-200">진행</div>
-        </div>
-      </div>
-
       {/* 날짜별 필터 */}
       {learnedData.learned_dates.length > 1 && (
         <div className="mb-6">
@@ -356,7 +332,58 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       )}
 
-      {/* 현재 용어 표시 */}
+      {/* 전체 용어 목록 */}
+      {filteredTerms.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <Target className="w-5 h-5" />
+            전체 용어 목록 ({filteredTerms.length}개)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+            {filteredTerms.map((term, index) => {
+              const termDifficulty = getDifficulty(term.term)
+              return (
+                <motion.div
+                  key={`${term.term}_${term.learned_date}_${term.info_index}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`p-3 rounded-lg cursor-pointer transition-all ${
+                    index === currentTermIndex
+                      ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/50'
+                      : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                  }`}
+                  onClick={() => setCurrentTermIndex(index)}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold text-white text-sm">{term.term}</div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleFavorite(term.term)
+                      }}
+                      className={`p-1 rounded ${
+                        favoriteTerms.has(term.term)
+                          ? 'text-yellow-400'
+                          : 'text-white/30 hover:text-yellow-400'
+                      }`}
+                    >
+                      <Star className="w-3 h-3" fill={favoriteTerms.has(term.term) ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                  <div className="text-white/60 text-xs line-clamp-2 mb-1">{term.description}</div>
+                  <div className="flex items-center justify-between">
+                    <div className={`text-xs px-1 py-0.5 rounded ${termDifficulty.bg} ${termDifficulty.color}`}>{termDifficulty.level}</div>
+                    <div className="text-white/40 text-xs">{term.learned_date}</div>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 학습한 용어 모음(검색/상세/네비) */}
       {currentTerm && (
         <motion.div
           key={currentTerm.term + currentTerm.learned_date}
@@ -428,58 +455,29 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       </div>
 
-      {/* 용어 목록 */}
-      {filteredTerms.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            전체 용어 목록 ({filteredTerms.length}개)
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
-            {filteredTerms.map((term, index) => {
-              const termDifficulty = getDifficulty(term.term)
-              return (
-                <motion.div
-                  key={`${term.term}_${term.learned_date}_${term.info_index}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`p-3 rounded-lg cursor-pointer transition-all ${
-                    index === currentTermIndex
-                      ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/50'
-                      : 'bg-white/5 hover:bg-white/10 border border-white/10'
-                  }`}
-                  onClick={() => setCurrentTermIndex(index)}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-semibold text-white text-sm">{term.term}</div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleFavorite(term.term)
-                      }}
-                      className={`p-1 rounded ${
-                        favoriteTerms.has(term.term)
-                          ? 'text-yellow-400'
-                          : 'text-white/30 hover:text-yellow-400'
-                      }`}
-                    >
-                      <Star className="w-3 h-3" fill={favoriteTerms.has(term.term) ? 'currentColor' : 'none'} />
-                    </button>
-                  </div>
-                  <div className="text-white/60 text-xs line-clamp-2 mb-1">{term.description}</div>
-                  <div className="flex items-center justify-between">
-                    <div className={`text-xs px-1 py-0.5 rounded ${termDifficulty.bg} ${termDifficulty.color}`}>
-                      {termDifficulty.level}
-                    </div>
-                    <div className="text-white/40 text-xs">{term.learned_date}</div>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
+      {/* 4개 카드(표시, 즐겨찾기, 일, 진행) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-blue-500/30 to-blue-800/20 border-0 active:scale-95 transition-transform">
+          <BookOpen className="w-7 h-7 text-blue-300 mb-1" />
+          <div className="text-xl font-extrabold text-blue-100 mb-0.5">{filteredTerms.length}</div>
+          <div className="text-xs font-semibold text-blue-200">표시</div>
         </div>
-      )}
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-yellow-400/30 to-green-400/20 border-0 active:scale-95 transition-transform">
+          <Star className="w-7 h-7 text-yellow-300 mb-1" />
+          <div className="text-xl font-extrabold text-yellow-100 mb-0.5">{favoriteTerms.size}</div>
+          <div className="text-xs font-semibold text-yellow-200">즐겨찾기</div>
+        </div>
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-purple-500/30 to-pink-500/20 border-0 active:scale-95 transition-transform">
+          <Calendar className="w-7 h-7 text-purple-300 mb-1" />
+          <div className="text-xl font-extrabold text-purple-100 mb-0.5">{learnedData.learned_dates.length}</div>
+          <div className="text-xs font-semibold text-purple-200">일</div>
+        </div>
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-orange-400/30 to-yellow-400/20 border-0 active:scale-95 transition-transform">
+          <TrendingUp className="w-7 h-7 text-orange-300 mb-1" />
+          <div className="text-xl font-extrabold text-orange-100 mb-0.5">{Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%</div>
+          <div className="text-xs font-semibold text-orange-200">진행</div>
+        </div>
+      </div>
     </div>
   )
 }
