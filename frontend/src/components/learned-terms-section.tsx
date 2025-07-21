@@ -294,67 +294,51 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       </div>
 
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {/* 상단 통계 카드 - 고급스럽고 유저 친화적으로 개선 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+        {/* 표시된 용어 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-xl rounded-xl p-4 border border-white/10"
+          transition={{ delay: 0 }}
+          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500/40 to-purple-500/30 border-0 hover:scale-105 transition-transform duration-200"
         >
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-blue-300" />
-            <div>
-              <div className="text-white font-semibold">{filteredTerms.length}</div>
-              <div className="text-white/60 text-sm">표시된 용어</div>
-            </div>
-          </div>
+          <BookOpen className="w-9 h-9 text-blue-300 mb-2 drop-shadow" />
+          <div className="text-3xl font-extrabold text-blue-100 mb-1 animate-pulse">{filteredTerms.length}</div>
+          <div className="text-base font-semibold text-blue-200">표시된 용어</div>
         </motion.div>
-
+        {/* 즐겨찾기 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-yellow-400/40 to-green-400/30 border-0 hover:scale-105 transition-transform duration-200"
+        >
+          <Star className="w-9 h-9 text-yellow-300 mb-2 drop-shadow" />
+          <div className="text-3xl font-extrabold text-yellow-100 mb-1 animate-pulse">{favoriteTerms.size}</div>
+          <div className="text-base font-semibold text-yellow-200">즐겨찾기</div>
+        </motion.div>
+        {/* 학습일수 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-xl rounded-xl p-4 border border-white/10"
+          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-purple-500/40 to-pink-500/30 border-0 hover:scale-105 transition-transform duration-200"
         >
-          <div className="flex items-center gap-3">
-            <Star className="w-6 h-6 text-green-300" />
-            <div>
-              <div className="text-white font-semibold">{favoriteTerms.size}</div>
-              <div className="text-white/60 text-sm">즐겨찾기</div>
-            </div>
-          </div>
+          <Calendar className="w-9 h-9 text-purple-300 mb-2 drop-shadow" />
+          <div className="text-3xl font-extrabold text-purple-100 mb-1 animate-pulse">{learnedData.learned_dates.length}</div>
+          <div className="text-base font-semibold text-purple-200">학습일수</div>
         </motion.div>
-
+        {/* 진행률 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-xl p-4 border border-white/10"
+          transition={{ delay: 0.15 }}
+          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-orange-400/40 to-yellow-400/30 border-0 hover:scale-105 transition-transform duration-200"
         >
-          <div className="flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-purple-300" />
-            <div>
-              <div className="text-white font-semibold">{learnedData.learned_dates.length}</div>
-              <div className="text-white/60 text-sm">학습일수</div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-xl rounded-xl p-4 border border-white/10"
-        >
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-6 h-6 text-yellow-300" />
-            <div>
-              <div className="text-white font-semibold">
-                {Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%
-              </div>
-              <div className="text-white/60 text-sm">진행률</div>
-            </div>
-          </div>
+          <TrendingUp className="w-9 h-9 text-orange-300 mb-2 drop-shadow" />
+          <div className="text-3xl font-extrabold text-orange-100 mb-1 animate-pulse">{Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%</div>
+          <div className="text-base font-semibold text-orange-200">진행률</div>
         </motion.div>
       </div>
 
