@@ -231,36 +231,6 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const todayData = percentChartData[percentChartData.length - 1] || { ai_percent: 0, terms_percent: 0, quiz_score: 0 };
   const todayStats = uniqueChartData[uniqueChartData.length - 1] || { ai_info: 0, terms: 0, quiz_correct: 0, quiz_total: 0 };
 
-  // XAxis 날짜 tickRenderer를 일반 함수형 컴포넌트로 변경
-  function DateTick({ x, y, payload, index }: any) {
-    const d = new Date(payload.value);
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    const week = ['일','월','화','수','목','금','토'][d.getDay()];
-    return (
-      <g transform={`translate(${x},${y})`} key={payload.value + '-' + index}>
-        <text
-          x={0}
-          y={0}
-          dy={16}
-          textAnchor="middle"
-          fill="#e0e7ff"
-          fontWeight={700}
-          fontSize={15}
-          style={{
-            paintOrder: 'stroke',
-            stroke: '#18181b',
-            strokeWidth: 0.5,
-            filter: 'drop-shadow(0 1px 2px #0006)'
-          }}
-          transform="rotate(-20)"
-        >
-          {`${month}/${day}(${week})`}
-        </text>
-      </g>
-    );
-  }
-
   return (
     <div className="space-y-8 relative">
       {/* 날짜 및 기간 선택 */}
