@@ -455,25 +455,22 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   labels: uniqueChartData.map((d) => d.date),
                   datasets: [
                     {
-                      type: 'bar',
                       label: 'AI 정보 학습',
                       data: uniqueChartData.map((d) => d.ai_info),
                       backgroundColor: 'rgba(59,130,246,0.5)',
                       borderColor: 'rgba(59,130,246,1)',
-                      borderWidth: 1,
+                      borderWidth: 2,
                       yAxisID: 'y',
                     },
                     {
-                      type: 'bar',
                       label: '용어 학습',
                       data: uniqueChartData.map((d) => d.terms),
                       backgroundColor: 'rgba(168,85,247,0.5)',
                       borderColor: 'rgba(168,85,247,1)',
-                      borderWidth: 1,
+                      borderWidth: 2,
                       yAxisID: 'y',
                     },
                     {
-                      type: 'line',
                       label: '퀴즈 점수(%)',
                       data: uniqueChartData.map((d) => d.quiz_score),
                       borderColor: 'rgba(34,197,94,1)',
