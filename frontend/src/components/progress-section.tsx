@@ -231,8 +231,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const todayData = percentChartData[percentChartData.length - 1] || { ai_percent: 0, terms_percent: 0, quiz_score: 0 };
   const todayStats = uniqueChartData[uniqueChartData.length - 1] || { ai_info: 0, terms: 0, quiz_correct: 0, quiz_total: 0 };
 
-  // XAxis 날짜 tickRenderer를 memoized 함수로 분리
-  const MemoizedDateTick = React.memo(({ x, y, payload, index }: any) => {
+  // XAxis 날짜 tickRenderer를 일반 함수형 컴포넌트로 변경
+  function DateTick({ x, y, payload, index }: any) {
     const d = new Date(payload.value);
     const month = d.getMonth() + 1;
     const day = d.getDate();
@@ -259,7 +259,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         </text>
       </g>
     );
-  });
+  }
 
   return (
     <div className="space-y-8 relative">
@@ -623,7 +623,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={MemoizedDateTick}
+                    tick={DateTick}
                     interval={0}
                     axisLine={{stroke:'#6366f1', strokeWidth:2}}
                     tickLine={false}
