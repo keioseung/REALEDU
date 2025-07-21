@@ -444,28 +444,16 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         )}
       </div>
 
-      {/* 상단 3개 카드(오늘/총/누적 등) 가로 배치 */}
-      <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-8 justify-center items-stretch">
-        {/* AI 정보학습 카드 */}
-        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-500/30 to-blue-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
-          <FaRobot className="w-10 h-10 text-blue-400 mb-2 drop-shadow" />
-          <div className="text-2xl font-extrabold text-blue-200 mb-1">{stats?.today_ai_info || 0} / {stats?.total_learned || 0}</div>
-          <div className="text-lg font-bold text-blue-100 mb-1">AI 정보 학습</div>
-          <div className="text-blue-300 text-base font-semibold">총 {stats?.total_ai_info_available || 0}개</div>
+      {/* 상단 3개 카드(오늘/총/누적 등) 한 줄(1행)로, 공간 최소화 */}
+      <div className="flex flex-wrap gap-4 mb-6 items-center justify-center text-sm">
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-900/40 text-blue-200 font-bold">
+          <FaRobot className="w-5 h-5 mr-1" /> {stats?.today_ai_info || 0} / {stats?.total_learned || 0} <span className="ml-1 font-normal text-blue-300">AI</span>
         </div>
-        {/* 용어학습 카드 */}
-        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-500/30 to-purple-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
-          <FaBookOpen className="w-10 h-10 text-pink-400 mb-2 drop-shadow" />
-          <div className="text-2xl font-extrabold text-pink-200 mb-1">{stats?.today_terms || 0} / {stats?.total_terms_learned || 0}</div>
-          <div className="text-lg font-bold text-pink-100 mb-1">용어 학습</div>
-          <div className="text-pink-300 text-base font-semibold">총 {stats?.total_terms_available || 0}개</div>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-pink-900/40 text-pink-200 font-bold">
+          <FaBookOpen className="w-5 h-5 mr-1" /> {stats?.today_terms || 0} / {stats?.total_terms_learned || 0} <span className="ml-1 font-normal text-pink-300">용어</span>
         </div>
-        {/* 퀴즈점수 카드 */}
-        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-500/30 to-green-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
-          <FaCheckCircle className="w-10 h-10 text-green-400 mb-2 drop-shadow" />
-          <div className="text-2xl font-extrabold text-green-200 mb-1">{stats?.today_quiz_correct || 0} / {stats?.today_quiz_total || 0}</div>
-          <div className="text-lg font-bold text-green-100 mb-1">퀴즈 정답률</div>
-          <div className="text-green-300 text-base font-semibold">{stats?.today_quiz_score || 0}%</div>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-green-900/40 text-green-200 font-bold">
+          <FaCheckCircle className="w-5 h-5 mr-1" /> {stats?.today_quiz_correct || 0} / {stats?.today_quiz_total || 0} <span className="ml-1 font-normal text-green-300">퀴즈</span>
         </div>
       </div>
 
@@ -556,24 +544,31 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                     padding: 0
                   }}
                 />
+                {/* 그래프 하단 pill형 범례 */}
                 <Legend
                   iconType="circle"
+                  align="center"
+                  verticalAlign="bottom"
+                  layout="horizontal"
                   wrapperStyle={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 16,
                     color: '#fff',
                     fontWeight: 900,
-                    fontSize: 18,
-                    padding: 14,
-                    borderRadius: 20,
-                    background: 'linear-gradient(90deg,rgba(99,102,241,0.18),rgba(236,72,153,0.13),rgba(16,185,129,0.13))',
-                    boxShadow: '0 2px 16px 0 rgba(80,80,180,0.13)',
-                    marginBottom: 8,
+                    fontSize: 16,
+                    padding: 10,
+                    borderRadius: 16,
+                    background: 'rgba(30,41,59,0.85)',
+                    boxShadow: '0 2px 12px 0 rgba(80,80,180,0.10)',
+                    marginTop: 18,
                     border: '1.5px solid #6366f1',
-                    letterSpacing: 1.2
+                    letterSpacing: 1.1
                   }}
                   formatter={(value: string) => {
-                    if (value === 'ai_percent') return <span style={{color:'#6366f1',fontWeight:800}}>AI 정보 달성률(%)</span>;
-                    if (value === 'terms_percent') return <span style={{color:'#ec4899',fontWeight:800}}>용어 달성률(%)</span>;
-                    if (value === 'quiz_score') return <span style={{color:'#10b981',fontWeight:800}}>퀴즈 정답률(%)</span>;
+                    if (value === 'ai_percent') return <span style={{color:'#6366f1',fontWeight:800,background:'#232946',borderRadius:12,padding:'4px 14px',marginRight:6,boxShadow:'0 1px 6px #6366f133'}}>AI 정보학습</span>;
+                    if (value === 'terms_percent') return <span style={{color:'#ec4899',fontWeight:800,background:'#2a1936',borderRadius:12,padding:'4px 14px',marginRight:6,boxShadow:'0 1px 6px #ec489933'}}>용어학습</span>;
+                    if (value === 'quiz_score') return <span style={{color:'#10b981',fontWeight:800,background:'#1a2c23',borderRadius:12,padding:'4px 14px',marginRight:6,boxShadow:'0 1px 6px #10b98133'}}>퀴즈점수</span>;
                     return value;
                   }}
                 />
