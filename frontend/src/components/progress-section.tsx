@@ -8,6 +8,7 @@ import { userProgressAPI } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, DotProps } from 'recharts'
 import { FaRobot, FaBookOpen, FaCheckCircle } from 'react-icons/fa';
+import React from 'react';
 
 
 interface ProgressSectionProps {
@@ -229,6 +230,36 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   // 오늘 데이터 추출
   const todayData = percentChartData[percentChartData.length - 1] || { ai_percent: 0, terms_percent: 0, quiz_score: 0 };
   const todayStats = uniqueChartData[uniqueChartData.length - 1] || { ai_info: 0, terms: 0, quiz_correct: 0, quiz_total: 0 };
+
+  // XAxis 날짜 tickRenderer를 memoized 함수로 분리
+  const MemoizedDateTick = React.memo(({ x, y, payload, index }: any) => {
+    const d = new Date(payload.value);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const week = ['일','월','화','수','목','금','토'][d.getDay()];
+    return (
+      <g transform={`translate(${x},${y})`} key={payload.value + '-' + index}>
+        <text
+          x={0}
+          y={0}
+          dy={16}
+          textAnchor="middle"
+          fill="#e0e7ff"
+          fontWeight={700}
+          fontSize={15}
+          style={{
+            paintOrder: 'stroke',
+            stroke: '#18181b',
+            strokeWidth: 0.5,
+            filter: 'drop-shadow(0 1px 2px #0006)'
+          }}
+          transform="rotate(-20)"
+        >
+          {`${month}/${day}(${week})`}
+        </text>
+      </g>
+    );
+  });
 
   return (
     <div className="space-y-8 relative">
@@ -592,28 +623,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={({ x, y, payload, index }) => (
-                      <g transform={`translate(${x},${y})`} key={payload.value + '-' + index}>
-                        <text
-                          x={0}
-                          y={0}
-                          dy={16}
-                          textAnchor="middle"
-                          fill="#e0e7ff"
-                          fontWeight={700}
-                          fontSize={15}
-                          style={{
-                            paintOrder: 'stroke',
-                            stroke: '#18181b',
-                            strokeWidth: 0.5,
-                            filter: 'drop-shadow(0 1px 2px #0006)'
-                          }}
-                          transform="rotate(-20)"
-                        >
-                          {formatDateLabel(payload.value)}
-                        </text>
-                      </g>
-                    )}
+                    tick={MemoizedDateTick}
                     interval={0}
                     axisLine={{stroke:'#6366f1', strokeWidth:2}}
                     tickLine={false}
@@ -669,6 +679,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                       marginBottom: 8,
                       border: '1.5px solid #6366f1',
                       letterSpacing: 1.2
+                    }}
+                    formatter={(value: string) => {
+                      if (value === 'ai_percent') return <span style={{color:'#6366f1',fontWeight:800}}>AI 정보 달성률(%)</span>;
+                      if (value === 'terms_percent') return <span style={{color:'#ec4899',fontWeight:800}}>용어 달성률(%)</span>;
+                      if (value === 'quiz_score') return <span style={{color:'#10b981',fontWeight:800}}>퀴즈 정답률(%)</span>;
+                      return value;
                     }}
                   />
                   <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={5} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 13 }} fill="url(#aiGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
