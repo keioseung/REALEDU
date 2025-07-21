@@ -294,19 +294,27 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       </div>
 
-      {/* 상단 통계 카드 - 공간을 적게 차지하는 간략 버전 */}
-      <div className="flex flex-wrap gap-4 mb-6 items-center justify-center text-sm">
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-900/40 text-blue-200 font-bold">
-          <BookOpen className="w-4 h-4 mr-1" /> {filteredTerms.length} <span className="ml-1 font-normal text-blue-300">표시</span>
+      {/* 상단 통계 카드 - 모바일 앱 유저 친화적 2x2 그리드, 카드형, 반응형 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-blue-500/30 to-blue-800/20 border-0 active:scale-95 transition-transform">
+          <BookOpen className="w-7 h-7 text-blue-300 mb-1" />
+          <div className="text-xl font-extrabold text-blue-100 mb-0.5">{filteredTerms.length}</div>
+          <div className="text-xs font-semibold text-blue-200">표시</div>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-900/40 text-yellow-200 font-bold">
-          <Star className="w-4 h-4 mr-1" /> {favoriteTerms.size} <span className="ml-1 font-normal text-yellow-300">즐겨찾기</span>
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-yellow-400/30 to-green-400/20 border-0 active:scale-95 transition-transform">
+          <Star className="w-7 h-7 text-yellow-300 mb-1" />
+          <div className="text-xl font-extrabold text-yellow-100 mb-0.5">{favoriteTerms.size}</div>
+          <div className="text-xs font-semibold text-yellow-200">즐겨찾기</div>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-900/40 text-purple-200 font-bold">
-          <Calendar className="w-4 h-4 mr-1" /> {learnedData.learned_dates.length} <span className="ml-1 font-normal text-purple-300">일</span>
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-purple-500/30 to-pink-500/20 border-0 active:scale-95 transition-transform">
+          <Calendar className="w-7 h-7 text-purple-300 mb-1" />
+          <div className="text-xl font-extrabold text-purple-100 mb-0.5">{learnedData.learned_dates.length}</div>
+          <div className="text-xs font-semibold text-purple-200">일</div>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-orange-900/40 text-orange-200 font-bold">
-          <TrendingUp className="w-4 h-4 mr-1" /> {Math.round((filteredTerms.length / learnedData.total_terms) * 100)}% <span className="ml-1 font-normal text-orange-300">진행</span>
+        <div className="flex flex-col items-center justify-center rounded-2xl shadow-lg p-4 bg-gradient-to-br from-orange-400/30 to-yellow-400/20 border-0 active:scale-95 transition-transform">
+          <TrendingUp className="w-7 h-7 text-orange-300 mb-1" />
+          <div className="text-xl font-extrabold text-orange-100 mb-0.5">{Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%</div>
+          <div className="text-xs font-semibold text-orange-200">진행</div>
         </div>
       </div>
 

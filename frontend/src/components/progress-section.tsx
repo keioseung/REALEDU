@@ -444,6 +444,31 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         )}
       </div>
 
+      {/* 상단 3개 카드(오늘/총/누적 등) 가로 배치 */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-8 justify-center items-stretch">
+        {/* AI 정보학습 카드 */}
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-500/30 to-blue-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
+          <FaRobot className="w-10 h-10 text-blue-400 mb-2 drop-shadow" />
+          <div className="text-2xl font-extrabold text-blue-200 mb-1">{stats?.today_ai_info || 0} / {stats?.total_learned || 0}</div>
+          <div className="text-lg font-bold text-blue-100 mb-1">AI 정보 학습</div>
+          <div className="text-blue-300 text-base font-semibold">총 {stats?.total_ai_info_available || 0}개</div>
+        </div>
+        {/* 용어학습 카드 */}
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-500/30 to-purple-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
+          <FaBookOpen className="w-10 h-10 text-pink-400 mb-2 drop-shadow" />
+          <div className="text-2xl font-extrabold text-pink-200 mb-1">{stats?.today_terms || 0} / {stats?.total_terms_learned || 0}</div>
+          <div className="text-lg font-bold text-pink-100 mb-1">용어 학습</div>
+          <div className="text-pink-300 text-base font-semibold">총 {stats?.total_terms_available || 0}개</div>
+        </div>
+        {/* 퀴즈점수 카드 */}
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-500/30 to-green-800/20 rounded-2xl shadow-xl p-6 flex flex-col items-center border-0">
+          <FaCheckCircle className="w-10 h-10 text-green-400 mb-2 drop-shadow" />
+          <div className="text-2xl font-extrabold text-green-200 mb-1">{stats?.today_quiz_correct || 0} / {stats?.today_quiz_total || 0}</div>
+          <div className="text-lg font-bold text-green-100 mb-1">퀴즈 정답률</div>
+          <div className="text-green-300 text-base font-semibold">{stats?.today_quiz_score || 0}%</div>
+        </div>
+      </div>
+
       {/* 기간별 학습 성장 그래프 - 완전히 새 고급 대시보드 스타일 */}
       <section className="w-full max-w-5xl mx-auto mt-10 mb-16">
         {/* 그래프 카드 - 단독 */}
