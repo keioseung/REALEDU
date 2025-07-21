@@ -107,8 +107,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   }
 
   // 그래프 데이터 준비 - 중복 제거 및 정렬
-  const chartData = periodStats?.period_data || []
-  
+  const chartData = periodStats?.period_data || [];
+
   // 날짜별로 중복 제거하고 정렬
   const uniqueChartData = chartData.reduce((acc: PeriodData[], current: PeriodData) => {
     const existingIndex = acc.findIndex(item => item.date === current.date)
@@ -127,6 +127,35 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
     }
     return acc
   }, []).sort((a: PeriodData, b: PeriodData) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+  // --- 퍼센트 변환 및 빈 날짜 채우기 ---
+  // 전체 기간 날짜 배열 생성
+  function getDateRangeArray(start: string, end: string) {
+    const arr = [];
+    let dt = new Date(start);
+    const endDt = new Date(end);
+    while (dt <= endDt) {
+      arr.push(dt.toISOString().split('T')[0]);
+      dt.setDate(dt.getDate() + 1);
+    }
+    return arr;
+  }
+  const dateArr = (periodStats?.start_date && periodStats?.end_date)
+    ? getDateRangeArray(periodStats.start_date, periodStats.end_date)
+    : [];
+  // 총 개수(분모)
+  const totalAI = stats?.total_ai_info_available || 1;
+  const totalTerms = stats?.total_terms_available || 1;
+  // 날짜별 데이터 매핑 (없으면 0)
+  const percentChartData = dateArr.map(date => {
+    const found = uniqueChartData.find(d => d.date === date);
+    return {
+      date,
+      ai_percent: found ? Math.round((found.ai_info / totalAI) * 100) : 0,
+      terms_percent: found ? Math.round((found.terms / totalTerms) * 100) : 0,
+      quiz_score: found ? found.quiz_score : 0,
+    };
+  });
   
   const maxAI = Math.max(...uniqueChartData.map((d: PeriodData) => d.ai_info), 1)
   const maxTerms = Math.max(...uniqueChartData.map((d: PeriodData) => d.terms), 1)
@@ -438,29 +467,23 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         <div className="glass rounded-2xl p-6" style={{ height: 320, minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {periodStats === undefined ? (
             <div className="text-center text-white/60 w-full">로딩 중...</div>
-          ) : uniqueChartData.length > 0 ? (
+          ) : (
             <div className="space-y-8 w-full" style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
-                  data={uniqueChartData}
+                  data={percentChartData}
                   margin={{ top: 20, right: 40, left: 0, bottom: 10 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#fff2" />
                   <XAxis dataKey="date" tick={{ fill: '#fff' }} />
-                  <YAxis yAxisId="left" tick={{ fill: '#fff' }} orientation="left" />
                   <YAxis yAxisId="right" orientation="right" tick={{ fill: '#fff' }} domain={[0, 100]} />
                   <Tooltip contentStyle={{ background: '#222', border: 'none', color: '#fff' }} labelStyle={{ color: '#fff' }} />
                   <Legend wrapperStyle={{ color: '#fff' }} />
-                  <Bar yAxisId="left" dataKey="ai_info" name="AI 정보 학습" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  <Bar yAxisId="left" dataKey="terms" name="용어 학습" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                  <Bar yAxisId="right" dataKey="ai_percent" name="AI 정보 학습(%)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar yAxisId="right" dataKey="terms_percent" name="용어 학습(%)" fill="#a855f7" radius={[4, 4, 0, 0]} />
                   <Line yAxisId="right" type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#22c55e" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="text-center text-white/60 w-full flex flex-col items-center justify-center" style={{height: '100%'}}>
-              <BarChart3 className="w-12 h-12 mb-4 opacity-40" />
-              <p>선택한 기간에 학습 데이터가 없습니다.</p>
             </div>
           )}
         </div>
