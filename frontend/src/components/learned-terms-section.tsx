@@ -294,52 +294,20 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
         </div>
       </div>
 
-      {/* 상단 통계 카드 - 고급스럽고 유저 친화적으로 개선 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-10">
-        {/* 표시된 용어 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0 }}
-          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-blue-500/40 to-purple-500/30 border-0 hover:scale-105 transition-transform duration-200"
-        >
-          <BookOpen className="w-9 h-9 text-blue-300 mb-2 drop-shadow" />
-          <div className="text-3xl font-extrabold text-blue-100 mb-1 animate-pulse">{filteredTerms.length}</div>
-          <div className="text-base font-semibold text-blue-200">표시된 용어</div>
-        </motion.div>
-        {/* 즐겨찾기 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-yellow-400/40 to-green-400/30 border-0 hover:scale-105 transition-transform duration-200"
-        >
-          <Star className="w-9 h-9 text-yellow-300 mb-2 drop-shadow" />
-          <div className="text-3xl font-extrabold text-yellow-100 mb-1 animate-pulse">{favoriteTerms.size}</div>
-          <div className="text-base font-semibold text-yellow-200">즐겨찾기</div>
-        </motion.div>
-        {/* 학습일수 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-purple-500/40 to-pink-500/30 border-0 hover:scale-105 transition-transform duration-200"
-        >
-          <Calendar className="w-9 h-9 text-purple-300 mb-2 drop-shadow" />
-          <div className="text-3xl font-extrabold text-purple-100 mb-1 animate-pulse">{learnedData.learned_dates.length}</div>
-          <div className="text-base font-semibold text-purple-200">학습일수</div>
-        </motion.div>
-        {/* 진행률 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="rounded-2xl shadow-xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-orange-400/40 to-yellow-400/30 border-0 hover:scale-105 transition-transform duration-200"
-        >
-          <TrendingUp className="w-9 h-9 text-orange-300 mb-2 drop-shadow" />
-          <div className="text-3xl font-extrabold text-orange-100 mb-1 animate-pulse">{Math.round((filteredTerms.length / learnedData.total_terms) * 100)}%</div>
-          <div className="text-base font-semibold text-orange-200">진행률</div>
-        </motion.div>
+      {/* 상단 통계 카드 - 공간을 적게 차지하는 간략 버전 */}
+      <div className="flex flex-wrap gap-4 mb-6 items-center justify-center text-sm">
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-900/40 text-blue-200 font-bold">
+          <BookOpen className="w-4 h-4 mr-1" /> {filteredTerms.length} <span className="ml-1 font-normal text-blue-300">표시</span>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-yellow-900/40 text-yellow-200 font-bold">
+          <Star className="w-4 h-4 mr-1" /> {favoriteTerms.size} <span className="ml-1 font-normal text-yellow-300">즐겨찾기</span>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-900/40 text-purple-200 font-bold">
+          <Calendar className="w-4 h-4 mr-1" /> {learnedData.learned_dates.length} <span className="ml-1 font-normal text-purple-300">일</span>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-orange-900/40 text-orange-200 font-bold">
+          <TrendingUp className="w-4 h-4 mr-1" /> {Math.round((filteredTerms.length / learnedData.total_terms) * 100)}% <span className="ml-1 font-normal text-orange-300">진행</span>
+        </div>
       </div>
 
       {/* 날짜별 필터 */}
