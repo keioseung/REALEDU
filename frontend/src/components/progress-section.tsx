@@ -580,122 +580,137 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         </div>
       </div>
 
-      {/* 기간별 추이 그래프 */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-white font-semibold text-lg">기간별 학습 추이</h3>
-          <div className="text-white/60 text-sm">
-            {periodStats?.start_date} ~ {periodStats?.end_date}
+      {/* 기간별 학습추이 - 완전히 새 고급 대시보드 스타일 */}
+      <section className="w-full max-w-5xl mx-auto mt-10 mb-16">
+        {/* 상단 카드형 범례/설명 */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-8 justify-center items-stretch">
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-500/30 to-blue-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+            <BarChart3 className="w-8 h-8 text-blue-400 mb-2" />
+            <div className="text-lg font-bold text-blue-100 mb-1">AI 정보 달성률</div>
+            <div className="text-2xl font-extrabold text-blue-200 mb-1">{todayData.ai_percent}%</div>
+            <div className="text-blue-300 text-xs">(3개 중 달성률)</div>
+          </div>
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-500/30 to-purple-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+            <BookOpen className="w-8 h-8 text-pink-400 mb-2" />
+            <div className="text-lg font-bold text-pink-100 mb-1">용어 달성률</div>
+            <div className="text-2xl font-extrabold text-pink-200 mb-1">{todayData.terms_percent}%</div>
+            <div className="text-pink-300 text-xs">(60개 중 달성률)</div>
+          </div>
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-500/30 to-green-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+            <FaCheckCircle className="w-8 h-8 text-green-400 mb-2" />
+            <div className="text-lg font-bold text-green-100 mb-1">퀴즈 정답률</div>
+            <div className="text-2xl font-extrabold text-green-200 mb-1">{todayData.quiz_score}%</div>
+            <div className="text-green-300 text-xs">(정답/총문제)</div>
           </div>
         </div>
-        {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6 mt-2 md:mt-6" style={{ height: 360, minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.16),rgba(236,72,153,0.13),rgba(16,185,129,0.13))', boxShadow: '0 8px 32px 0 rgba(31,41,55,0.18)' }}>
-          {periodStats === undefined ? (
-            <div className="text-center text-white/60 w-full">로딩 중...</div>
-          ) : (
-            <div className="w-full" style={{ height: 340 }}>
-              <ResponsiveContainer width="100%" height={320}>
-                <LineChart
-                  data={percentChartData}
-                  margin={{ top: 36, right: 40, left: 0, bottom: 10 }}
-                >
-                  <defs>
-                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-                      <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                    <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.95}/>
-                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0.18}/>
-                    </linearGradient>
-                    <linearGradient id="termsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ec4899" stopOpacity={0.95}/>
-                      <stop offset="100%" stopColor="#ec4899" stopOpacity={0.18}/>
-                    </linearGradient>
-                    <linearGradient id="quizGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.95}/>
-                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.18}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
-                  <XAxis
-                    dataKey="date"
-                    tick={DateTick}
-                    interval={0}
-                    axisLine={{stroke:'#6366f1', strokeWidth:2}}
-                    tickLine={false}
-                    minTickGap={0}
-                    allowDuplicatedCategory={false}
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={({ x, y, payload }) => (
-                      <g transform={`translate(${x},${y})`} key={payload.value}>
-                        <text
-                          x={0}
-                          y={0}
-                          dy={4}
-                          textAnchor="end"
-                          fill="#e0e7ff"
-                          fontWeight={700}
-                          fontSize={15}
-                          style={{
-                            paintOrder: 'stroke',
-                            stroke: '#18181b',
-                            strokeWidth: 0.5,
-                            filter: 'drop-shadow(0 1px 2px #0006)'
-                          }}
-                        >
-                          {payload.value}%
-                        </text>
-                      </g>
-                    )}
-                    axisLine={{stroke:'#6366f1', strokeWidth:2}}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    content={<CustomTooltip />}
-                    wrapperStyle={{
-                      borderRadius: 18,
-                      boxShadow: '0 4px 24px 0 rgba(80,80,180,0.18)',
-                      background: 'rgba(30,41,59,0.98)',
-                      border: '2px solid #6366f1',
-                      padding: 0
-                    }}
-                  />
-                  <Legend
-                    iconType="circle"
-                    wrapperStyle={{
-                      color: '#fff',
-                      fontWeight: 900,
-                      fontSize: 18,
-                      padding: 14,
-                      borderRadius: 20,
-                      background: 'linear-gradient(90deg,rgba(99,102,241,0.18),rgba(236,72,153,0.13),rgba(16,185,129,0.13))',
-                      boxShadow: '0 2px 16px 0 rgba(80,80,180,0.13)',
-                      marginBottom: 8,
-                      border: '1.5px solid #6366f1',
-                      letterSpacing: 1.2
-                    }}
-                    formatter={(value: string) => {
-                      if (value === 'ai_percent') return <span style={{color:'#6366f1',fontWeight:800}}>AI 정보 달성률(%)</span>;
-                      if (value === 'terms_percent') return <span style={{color:'#ec4899',fontWeight:800}}>용어 달성률(%)</span>;
-                      if (value === 'quiz_score') return <span style={{color:'#10b981',fontWeight:800}}>퀴즈 정답률(%)</span>;
-                      return value;
-                    }}
-                  />
-                  <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={5} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 13 }} fill="url(#aiGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
-                  <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={5} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 13 }} fill="url(#termsGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
-                  <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={5} dot={<CustomDot color="#10b981" />} activeDot={{ r: 13 }} fill="url(#quizGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
+        {/* 그래프 카드 */}
+        <div className="rounded-3xl shadow-2xl p-8 bg-gradient-to-br from-slate-900/80 via-purple-900/60 to-slate-900/80 border-0 flex flex-col items-center justify-center">
+          <h3 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-3 drop-shadow">
+            <TrendingUp className="w-7 h-7 text-yellow-300" />
+            기간별 학습 성장 그래프
+          </h3>
+          <div className="w-full" style={{ height: 340 }}>
+            <ResponsiveContainer width="100%" height={320}>
+              <LineChart
+                data={percentChartData}
+                margin={{ top: 36, right: 40, left: 0, bottom: 10 }}
+              >
+                <defs>
+                  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.95}/>
+                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0.18}/>
+                  </linearGradient>
+                  <linearGradient id="termsGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ec4899" stopOpacity={0.95}/>
+                    <stop offset="100%" stopColor="#ec4899" stopOpacity={0.18}/>
+                  </linearGradient>
+                  <linearGradient id="quizGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.95}/>
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.18}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tick={DateTick}
+                  interval={0}
+                  axisLine={{stroke:'#6366f1', strokeWidth:2}}
+                  tickLine={false}
+                  minTickGap={0}
+                  allowDuplicatedCategory={false}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={({ x, y, payload }) => (
+                    <g transform={`translate(${x},${y})`} key={payload.value}>
+                      <text
+                        x={0}
+                        y={0}
+                        dy={4}
+                        textAnchor="end"
+                        fill="#e0e7ff"
+                        fontWeight={700}
+                        fontSize={15}
+                        style={{
+                          paintOrder: 'stroke',
+                          stroke: '#18181b',
+                          strokeWidth: 0.5,
+                          filter: 'drop-shadow(0 1px 2px #0006)'
+                        }}
+                      >
+                        {payload.value}%
+                      </text>
+                    </g>
+                  )}
+                  axisLine={{stroke:'#6366f1', strokeWidth:2}}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  wrapperStyle={{
+                    borderRadius: 18,
+                    boxShadow: '0 4px 24px 0 rgba(80,80,180,0.18)',
+                    background: 'rgba(30,41,59,0.98)',
+                    border: '2px solid #6366f1',
+                    padding: 0
+                  }}
+                />
+                <Legend
+                  iconType="circle"
+                  wrapperStyle={{
+                    color: '#fff',
+                    fontWeight: 900,
+                    fontSize: 18,
+                    padding: 14,
+                    borderRadius: 20,
+                    background: 'linear-gradient(90deg,rgba(99,102,241,0.18),rgba(236,72,153,0.13),rgba(16,185,129,0.13))',
+                    boxShadow: '0 2px 16px 0 rgba(80,80,180,0.13)',
+                    marginBottom: 8,
+                    border: '1.5px solid #6366f1',
+                    letterSpacing: 1.2
+                  }}
+                  formatter={(value: string) => {
+                    if (value === 'ai_percent') return <span style={{color:'#6366f1',fontWeight:800}}>AI 정보 달성률(%)</span>;
+                    if (value === 'terms_percent') return <span style={{color:'#ec4899',fontWeight:800}}>용어 달성률(%)</span>;
+                    if (value === 'quiz_score') return <span style={{color:'#10b981',fontWeight:800}}>퀴즈 정답률(%)</span>;
+                    return value;
+                  }}
+                />
+                <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={5} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 13 }} fill="url(#aiGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
+                <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={5} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 13 }} fill="url(#termsGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
+                <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={5} dot={<CustomDot color="#10b981" />} activeDot={{ r: 13 }} fill="url(#quizGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
