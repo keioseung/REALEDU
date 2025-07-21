@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, TrendingUp, BookOpen, Target, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useUserStats } from '@/hooks/use-user-progress'
@@ -213,6 +213,17 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
       didAnimate.current = true;
     }
   }, []);
+
+  // 날짜 포맷 함수 (예: 2024-06-01 → 6/1(토))
+  const formatDateLabel = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const week = ['일','월','화','수','목','금','토'][d.getDay()];
+    return `${month}/${day}(${week})`;
+  };
+  // X축 라벨 미리 메모이제이션
+  const xLabels = useMemo(() => percentChartData.map(d => formatDateLabel(d.date)), [percentChartData]);
 
   return (
     <div className="space-y-8 relative">
@@ -549,10 +560,87 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fill: '#e0e7ff', fontWeight: 700, fontSize: 15 }} axisLine={{stroke:'#6366f1', strokeWidth:2}} tickLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fill: '#e0e7ff', fontWeight: 700, fontSize: 15 }} axisLine={{stroke:'#6366f1', strokeWidth:2}} tickLine={false} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend iconType="circle" wrapperStyle={{ color: '#fff', fontWeight: 800, fontSize: 17, padding: 10, borderRadius: 16, background: 'rgba(30,41,59,0.8)', boxShadow: '0 2px 12px 0 rgba(80,80,180,0.10)' }} />
+                  <XAxis
+                    dataKey="date"
+                    tick={({ x, y, payload, index }) => (
+                      <g transform={`translate(${x},${y})`} key={payload.value}>
+                        <text
+                          x={0}
+                          y={0}
+                          dy={16}
+                          textAnchor="middle"
+                          fill="#e0e7ff"
+                          fontWeight={700}
+                          fontSize={15}
+                          style={{
+                            paintOrder: 'stroke',
+                            stroke: '#18181b',
+                            strokeWidth: 0.5,
+                            filter: 'drop-shadow(0 1px 2px #0006)'
+                          }}
+                          transform="rotate(-20)"
+                        >
+                          {formatDateLabel(payload.value)}
+                        </text>
+                      </g>
+                    )}
+                    interval={0}
+                    axisLine={{stroke:'#6366f1', strokeWidth:2}}
+                    tickLine={false}
+                    minTickGap={0}
+                    allowDuplicatedCategory={false}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={({ x, y, payload }) => (
+                      <g transform={`translate(${x},${y})`} key={payload.value}>
+                        <text
+                          x={0}
+                          y={0}
+                          dy={4}
+                          textAnchor="end"
+                          fill="#e0e7ff"
+                          fontWeight={700}
+                          fontSize={15}
+                          style={{
+                            paintOrder: 'stroke',
+                            stroke: '#18181b',
+                            strokeWidth: 0.5,
+                            filter: 'drop-shadow(0 1px 2px #0006)'
+                          }}
+                        >
+                          {payload.value}%
+                        </text>
+                      </g>
+                    )}
+                    axisLine={{stroke:'#6366f1', strokeWidth:2}}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    wrapperStyle={{
+                      borderRadius: 18,
+                      boxShadow: '0 4px 24px 0 rgba(80,80,180,0.18)',
+                      background: 'rgba(30,41,59,0.98)',
+                      border: '2px solid #6366f1',
+                      padding: 0
+                    }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    wrapperStyle={{
+                      color: '#fff',
+                      fontWeight: 900,
+                      fontSize: 18,
+                      padding: 14,
+                      borderRadius: 20,
+                      background: 'linear-gradient(90deg,rgba(99,102,241,0.18),rgba(236,72,153,0.13),rgba(16,185,129,0.13))',
+                      boxShadow: '0 2px 16px 0 rgba(80,80,180,0.13)',
+                      marginBottom: 8,
+                      border: '1.5px solid #6366f1',
+                      letterSpacing: 1.2
+                    }}
+                  />
                   <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={5} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 13 }} fill="url(#aiGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
                   <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={5} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 13 }} fill="url(#termsGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
                   <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={5} dot={<CustomDot color="#10b981" />} activeDot={{ r: 13 }} fill="url(#quizGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
