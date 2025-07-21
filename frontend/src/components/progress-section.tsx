@@ -143,17 +143,22 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const dateArr = (periodStats?.start_date && periodStats?.end_date)
     ? getDateRangeArray(periodStats.start_date, periodStats.end_date)
     : [];
-  // 총 개수(분모)
-  const totalAI = stats?.total_ai_info_available || 1;
-  const totalTerms = stats?.total_terms_available || 1;
+  // 각 날짜별로 고정된 분모 사용
+  const totalAI = 3;
+  const totalTerms = 60;
   // 날짜별 데이터 매핑 (없으면 0)
   const percentChartData = dateArr.map(date => {
     const found = uniqueChartData.find(d => d.date === date);
+    // 퀴즈 퍼센트 계산: 정답/총문제 * 100
+    let quizPercent = 0;
+    if (found && found.quiz_total > 0) {
+      quizPercent = Math.round((found.quiz_correct / found.quiz_total) * 100);
+    }
     return {
       date,
       ai_percent: found ? Math.round((found.ai_info / totalAI) * 100) : 0,
       terms_percent: found ? Math.round((found.terms / totalTerms) * 100) : 0,
-      quiz_score: found ? found.quiz_score : 0,
+      quiz_score: quizPercent,
     };
   });
   
