@@ -6,19 +6,8 @@ import { BarChart3, TrendingUp, BookOpen, Target, Calendar, ChevronLeft, Chevron
 import { useUserStats } from '@/hooks/use-user-progress'
 import { userProgressAPI } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
-import { Line } from 'react-chartjs-2'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-} from 'chart.js'
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend)
 
 interface ProgressSectionProps {
   sessionId: string
@@ -450,71 +439,23 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           {periodStats === undefined ? (
             <div className="text-center text-white/60 w-full">로딩 중...</div>
           ) : uniqueChartData.length > 0 ? (
-            <div className="space-y-8 w-full">
-              <Line
-                data={{
-                  labels: uniqueChartData.map((d) => d.date),
-                  datasets: [
-                    {
-                      label: 'AI 정보 학습',
-                      data: uniqueChartData.map((d) => d.ai_info),
-                      backgroundColor: 'rgba(59,130,246,0.5)',
-                      borderColor: 'rgba(59,130,246,1)',
-                      borderWidth: 2,
-                      yAxisID: 'y',
-                    },
-                    {
-                      label: '용어 학습',
-                      data: uniqueChartData.map((d) => d.terms),
-                      backgroundColor: 'rgba(168,85,247,0.5)',
-                      borderColor: 'rgba(168,85,247,1)',
-                      borderWidth: 2,
-                      yAxisID: 'y',
-                    },
-                    {
-                      label: '퀴즈 점수(%)',
-                      data: uniqueChartData.map((d) => d.quiz_score),
-                      borderColor: 'rgba(34,197,94,1)',
-                      backgroundColor: 'rgba(34,197,94,0.2)',
-                      borderWidth: 2,
-                      tension: 0.3,
-                      yAxisID: 'y1',
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { labels: { color: '#fff' } },
-                    tooltip: { mode: 'index', intersect: false },
-                  },
-                  scales: {
-                    x: {
-                      ticks: { color: '#fff' },
-                      grid: { color: 'rgba(255,255,255,0.1)' },
-                    },
-                    y: {
-                      type: 'linear',
-                      position: 'left',
-                      beginAtZero: true,
-                      title: { display: true, text: '학습 개수', color: '#fff' },
-                      ticks: { color: '#fff' },
-                      grid: { color: 'rgba(255,255,255,0.1)' },
-                    },
-                    y1: {
-                      type: 'linear',
-                      position: 'right',
-                      beginAtZero: true,
-                      min: 0,
-                      max: 100,
-                      title: { display: true, text: '퀴즈 점수(%)', color: '#fff' },
-                      ticks: { color: '#fff' },
-                      grid: { drawOnChartArea: false },
-                    },
-                  },
-                }}
-                height={320}
-              />
+            <div className="space-y-8 w-full" style={{ height: 320 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={uniqueChartData}
+                  margin={{ top: 20, right: 40, left: 0, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#fff2" />
+                  <XAxis dataKey="date" tick={{ fill: '#fff' }} />
+                  <YAxis yAxisId="left" tick={{ fill: '#fff' }} orientation="left" />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#fff' }} domain={[0, 100]} />
+                  <Tooltip contentStyle={{ background: '#222', border: 'none', color: '#fff' }} labelStyle={{ color: '#fff' }} />
+                  <Legend wrapperStyle={{ color: '#fff' }} />
+                  <Bar yAxisId="left" dataKey="ai_info" name="AI 정보 학습" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar yAxisId="left" dataKey="terms" name="용어 학습" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                  <Line yAxisId="right" type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#22c55e" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           ) : (
             <div className="text-center text-white/60 w-full flex flex-col items-center justify-center" style={{height: '100%'}}>
