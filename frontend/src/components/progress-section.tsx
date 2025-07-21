@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, TrendingUp, BookOpen, Target, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useUserStats } from '@/hooks/use-user-progress'
@@ -193,16 +193,26 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
     }
     return null;
   };
-  // 커스텀 마커
+  // 커스텀 마커 (입체+glow)
   const CustomDot = (props: DotProps & { color: string }) => {
     const { cx, cy, color } = props;
     return (
       <g>
-        <circle cx={cx} cy={cy} r={8} fill={color} fillOpacity={0.18} />
-        <circle cx={cx} cy={cy} r={5} fill={color} stroke="#fff" strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={12} fill={color} fillOpacity={0.12} filter="url(#glow)" />
+        <circle cx={cx} cy={cy} r={7} fill={color} stroke="#fff" strokeWidth={2} />
       </g>
     );
   };
+
+  // 애니메이션 mount 시 한 번만
+  const didAnimate = useRef(false);
+  const [animationActive, setAnimationActive] = useState(true);
+  useEffect(() => {
+    if (!didAnimate.current) {
+      setTimeout(() => setAnimationActive(false), 1400); // 1.4초 후 애니메이션 비활성화
+      didAnimate.current = true;
+    }
+  }, []);
 
   return (
     <div className="space-y-8 relative">
@@ -507,38 +517,45 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
         </div>
         {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6" style={{ height: 340, minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.12),rgba(236,72,153,0.10),rgba(16,185,129,0.10))' }}>
+        <div className="glass rounded-2xl p-6" style={{ height: 360, minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,rgba(67,56,202,0.16),rgba(236,72,153,0.13),rgba(16,185,129,0.13))', boxShadow: '0 8px 32px 0 rgba(31,41,55,0.18)' }}>
           {periodStats === undefined ? (
             <div className="text-center text-white/60 w-full">로딩 중...</div>
           ) : (
-            <div className="w-full" style={{ height: 320 }}>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="w-full" style={{ height: 340 }}>
+              <ResponsiveContainer width="100%" height={320}>
                 <LineChart
                   data={percentChartData}
-                  margin={{ top: 30, right: 40, left: 0, bottom: 10 }}
+                  margin={{ top: 36, right: 40, left: 0, bottom: 10 }}
                 >
                   <defs>
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
                     <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.9}/>
-                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0.2}/>
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0.18}/>
                     </linearGradient>
                     <linearGradient id="termsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ec4899" stopOpacity={0.9}/>
-                      <stop offset="100%" stopColor="#ec4899" stopOpacity={0.2}/>
+                      <stop offset="0%" stopColor="#ec4899" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#ec4899" stopOpacity={0.18}/>
                     </linearGradient>
                     <linearGradient id="quizGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.9}/>
-                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.2}/>
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.95}/>
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.18}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 6" stroke="#fff2" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fill: '#e0e7ff', fontWeight: 600 }} axisLine={{stroke:'#6366f1'}} tickLine={false} />
-                  <YAxis domain={[0, 100]} tick={{ fill: '#e0e7ff', fontWeight: 600 }} axisLine={{stroke:'#6366f1'}} tickLine={false} />
+                  <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
+                  <XAxis dataKey="date" tick={{ fill: '#e0e7ff', fontWeight: 700, fontSize: 15 }} axisLine={{stroke:'#6366f1', strokeWidth:2}} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fill: '#e0e7ff', fontWeight: 700, fontSize: 15 }} axisLine={{stroke:'#6366f1', strokeWidth:2}} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend iconType="circle" wrapperStyle={{ color: '#fff', fontWeight: 700, fontSize: 15, padding: 8, borderRadius: 12, background: 'rgba(30,41,59,0.7)' }} />
-                  <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={4} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 10 }} fill="url(#aiGrad)" isAnimationActive animationDuration={1200} />
-                  <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={4} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 10 }} fill="url(#termsGrad)" isAnimationActive animationDuration={1200} />
-                  <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={4} dot={<CustomDot color="#10b981" />} activeDot={{ r: 10 }} fill="url(#quizGrad)" isAnimationActive animationDuration={1200} />
+                  <Legend iconType="circle" wrapperStyle={{ color: '#fff', fontWeight: 800, fontSize: 17, padding: 10, borderRadius: 16, background: 'rgba(30,41,59,0.8)', boxShadow: '0 2px 12px 0 rgba(80,80,180,0.10)' }} />
+                  <Line type="monotone" dataKey="ai_percent" name="AI 정보 학습(%)" stroke="#6366f1" strokeWidth={5} dot={<CustomDot color="#6366f1" />} activeDot={{ r: 13 }} fill="url(#aiGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
+                  <Line type="monotone" dataKey="terms_percent" name="용어 학습(%)" stroke="#ec4899" strokeWidth={5} dot={<CustomDot color="#ec4899" />} activeDot={{ r: 13 }} fill="url(#termsGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
+                  <Line type="monotone" dataKey="quiz_score" name="퀴즈 점수(%)" stroke="#10b981" strokeWidth={5} dot={<CustomDot color="#10b981" />} activeDot={{ r: 13 }} fill="url(#quizGrad)" isAnimationActive={animationActive} animationDuration={1400} filter="url(#glow)" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
