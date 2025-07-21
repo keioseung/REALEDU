@@ -6,6 +6,19 @@ import { BarChart3, TrendingUp, BookOpen, Target, Calendar, ChevronLeft, Chevron
 import { useUserStats } from '@/hooks/use-user-progress'
 import { userProgressAPI } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
+import { Line } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend)
 
 interface ProgressSectionProps {
   sessionId: string
@@ -157,6 +170,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                 zIndex: 9999
               }}
             />
+            <button
+              type="button"
+              onClick={() => handleDateChange(new Date().toISOString().split('T')[0])}
+              className="ml-2 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs md:text-sm font-bold shadow border border-white/20 transition-all"
+              style={{ minWidth: 50 }}
+            >
+              오늘
+            </button>
           </div>
         </div>
 
@@ -424,118 +445,78 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             {periodStats?.start_date} ~ {periodStats?.end_date}
           </div>
         </div>
-
-        {/* 그래프 컨테이너 */}
+        {/* 개선된 그래프 컨테이너 */}
         <div className="glass rounded-2xl p-6">
           {uniqueChartData.length > 0 ? (
             <div className="space-y-8">
-              {/* AI 정보 추이 */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-white/80 font-medium">AI 정보 학습</span>
-                  </div>
-                  <span className="text-white/60 text-sm">
-                    최대: {maxAI}개
-                  </span>
-                </div>
-                <div className="flex items-end gap-1 h-32">
-                  {uniqueChartData.map((data, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div className="relative w-full">
-                        <div
-                          className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-sm transition-all duration-500 hover:from-blue-400 hover:to-blue-300"
-                          style={{ 
-                            height: `${(data.ai_info / maxAI) * 100}%`,
-                            minHeight: '4px'
-                          }}
-                        />
-                        {data.ai_info > 0 && (
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-medium">
-                            {data.ai_info}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-xs text-white/50 mt-2 text-center">
-                        {new Date(data.date).getDate()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 용어 학습 추이 */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-white/80 font-medium">용어 학습</span>
-                  </div>
-                  <span className="text-white/60 text-sm">
-                    최대: {maxTerms}개
-                  </span>
-                </div>
-                <div className="flex items-end gap-1 h-32">
-                  {uniqueChartData.map((data, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div className="relative w-full">
-                        <div
-                          className="bg-gradient-to-t from-purple-500 to-purple-400 rounded-t-sm transition-all duration-500 hover:from-purple-400 hover:to-purple-300"
-                          style={{ 
-                            height: `${(data.terms / maxTerms) * 100}%`,
-                            minHeight: '4px'
-                          }}
-                        />
-                        {data.terms > 0 && (
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">
-                            {data.terms}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-xs text-white/50 mt-2 text-center">
-                        {new Date(data.date).getDate()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 퀴즈 점수 추이 */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-white/80 font-medium">퀴즈 점수</span>
-                  </div>
-                  <span className="text-white/60 text-sm">
-                    최대: {maxQuiz}%
-                  </span>
-                </div>
-                <div className="flex items-end gap-1 h-32">
-                  {uniqueChartData.map((data, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div className="relative w-full">
-                        <div
-                          className="bg-gradient-to-t from-green-500 to-green-400 rounded-t-sm transition-all duration-500 hover:from-green-400 hover:to-green-300"
-                          style={{ 
-                            height: `${(data.quiz_score / maxQuiz) * 100}%`,
-                            minHeight: '4px'
-                          }}
-                        />
-                        {data.quiz_score > 0 && (
-                          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs text-green-400 font-medium">
-                            {data.quiz_score}%
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-xs text-white/50 mt-2 text-center">
-                        {new Date(data.date).getDate()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* 통합 라인/바 그래프 */}
+              <Line
+                data={{
+                  labels: uniqueChartData.map((d) => d.date),
+                  datasets: [
+                    {
+                      type: 'bar',
+                      label: 'AI 정보 학습',
+                      data: uniqueChartData.map((d) => d.ai_info),
+                      backgroundColor: 'rgba(59,130,246,0.5)',
+                      borderColor: 'rgba(59,130,246,1)',
+                      borderWidth: 1,
+                      yAxisID: 'y',
+                    },
+                    {
+                      type: 'bar',
+                      label: '용어 학습',
+                      data: uniqueChartData.map((d) => d.terms),
+                      backgroundColor: 'rgba(168,85,247,0.5)',
+                      borderColor: 'rgba(168,85,247,1)',
+                      borderWidth: 1,
+                      yAxisID: 'y',
+                    },
+                    {
+                      type: 'line',
+                      label: '퀴즈 점수(%)',
+                      data: uniqueChartData.map((d) => d.quiz_score),
+                      borderColor: 'rgba(34,197,94,1)',
+                      backgroundColor: 'rgba(34,197,94,0.2)',
+                      borderWidth: 2,
+                      tension: 0.3,
+                      yAxisID: 'y1',
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    tooltip: { mode: 'index', intersect: false },
+                  },
+                  scales: {
+                    x: {
+                      ticks: { color: '#fff' },
+                      grid: { color: 'rgba(255,255,255,0.1)' },
+                    },
+                    y: {
+                      type: 'linear',
+                      position: 'left',
+                      beginAtZero: true,
+                      title: { display: true, text: '학습 개수', color: '#fff' },
+                      ticks: { color: '#fff' },
+                      grid: { color: 'rgba(255,255,255,0.1)' },
+                    },
+                    y1: {
+                      type: 'linear',
+                      position: 'right',
+                      beginAtZero: true,
+                      min: 0,
+                      max: 100,
+                      title: { display: true, text: '퀴즈 점수(%)', color: '#fff' },
+                      ticks: { color: '#fff' },
+                      grid: { drawOnChartArea: false },
+                    },
+                  },
+                }}
+                height={320}
+              />
             </div>
           ) : (
             <div className="text-center text-white/60 py-8">

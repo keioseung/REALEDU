@@ -146,6 +146,15 @@ export default function DashboardPage() {
     }
   }, [router])
 
+  useEffect(() => {
+    if (activeTab === 'progress') {
+      const today = new Date().toISOString().split('T')[0]
+      if (selectedDate !== today) {
+        setSelectedDate(today)
+      }
+    }
+  }, [activeTab])
+
   // 학습 진행률 계산 (로컬 스토리지와 백엔드 데이터 통합)
   const totalAIInfo = aiInfo?.length || 0
   
@@ -359,6 +368,14 @@ export default function DashboardPage() {
             <span className="px-2 md:px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-xs md:text-sm shadow">
               {selectedDate === new Date().toISOString().split('T')[0] ? '오늘' : selectedDate}
             </span>
+            <button
+              type="button"
+              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+              className="ml-2 px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs md:text-sm font-bold shadow border border-white/20 transition-all"
+              style={{ minWidth: 50 }}
+            >
+              오늘
+            </button>
           </div>
         </div>
       )}
