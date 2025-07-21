@@ -446,11 +446,11 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
         </div>
         {/* 개선된 그래프 컨테이너 */}
-        <div className="glass rounded-2xl p-6" style={{ minHeight: 320 }}>
+        <div className="glass rounded-2xl p-6" style={{ height: 320, minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {periodStats === undefined ? (
-            <div className="text-center text-white/60 py-8">로딩 중...</div>
+            <div className="text-center text-white/60 w-full">로딩 중...</div>
           ) : uniqueChartData.length > 0 ? (
-            <div className="space-y-8">
+            <div className="space-y-8 w-full">
               {/* 통합 라인 그래프 */}
               <Line
                 data={{
@@ -518,8 +518,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               />
             </div>
           ) : (
-            <div className="text-center text-white/60 py-8">
-              <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-40" />
+            <div className="text-center text-white/60 w-full flex flex-col items-center justify-center" style={{height: '100%'}}>
+              <BarChart3 className="w-12 h-12 mb-4 opacity-40" />
               <p>선택한 기간에 학습 데이터가 없습니다.</p>
             </div>
           )}
