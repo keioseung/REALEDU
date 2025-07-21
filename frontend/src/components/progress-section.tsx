@@ -444,17 +444,36 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         )}
       </div>
 
-      {/* 상단 3개 카드(오늘/총/누적 등) 한 줄(1행)로, 공간 최소화 */}
-      <div className="flex flex-wrap gap-4 mb-6 items-center justify-center text-sm">
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-900/40 text-blue-200 font-bold">
-          <FaRobot className="w-5 h-5 mr-1" /> {stats?.today_ai_info || 0} / {stats?.total_learned || 0} <span className="ml-1 font-normal text-blue-300">AI</span>
+      {/* 상단: 오늘의 성장 요약 카드 */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-8 justify-center items-stretch">
+        <div className="flex-1 min-w-[160px] bg-gradient-to-br from-blue-500/40 to-blue-900/30 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <FaRobot className="w-8 h-8 text-blue-400 mb-2" />
+          <div className="text-lg font-bold text-blue-100 mb-1">오늘 AI 학습</div>
+          <div className="text-2xl font-extrabold text-blue-200 mb-1 animate-pulse">{stats?.today_ai_info || 0}</div>
+          <div className="text-blue-300 text-xs">누적 {stats?.total_learned || 0} / 총 {stats?.total_ai_info_available || 0}</div>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-pink-900/40 text-pink-200 font-bold">
-          <FaBookOpen className="w-5 h-5 mr-1" /> {stats?.today_terms || 0} / {stats?.total_terms_learned || 0} <span className="ml-1 font-normal text-pink-300">용어</span>
+        <div className="flex-1 min-w-[160px] bg-gradient-to-br from-pink-500/40 to-purple-900/30 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <FaBookOpen className="w-8 h-8 text-pink-400 mb-2" />
+          <div className="text-lg font-bold text-pink-100 mb-1">오늘 용어 학습</div>
+          <div className="text-2xl font-extrabold text-pink-200 mb-1 animate-pulse">{stats?.today_terms || 0}</div>
+          <div className="text-pink-300 text-xs">누적 {stats?.total_terms_learned || 0} / 총 {stats?.total_terms_available || 0}</div>
         </div>
-        <div className="flex items-center gap-1 px-3 py-1 rounded-lg bg-green-900/40 text-green-200 font-bold">
-          <FaCheckCircle className="w-5 h-5 mr-1" /> {stats?.today_quiz_correct || 0} / {stats?.today_quiz_total || 0} <span className="ml-1 font-normal text-green-300">퀴즈</span>
+        <div className="flex-1 min-w-[160px] bg-gradient-to-br from-green-500/40 to-green-900/30 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <FaCheckCircle className="w-8 h-8 text-green-400 mb-2" />
+          <div className="text-lg font-bold text-green-100 mb-1">오늘 퀴즈 정답</div>
+          <div className="text-2xl font-extrabold text-green-200 mb-1 animate-pulse">{stats?.today_quiz_correct || 0} / {stats?.today_quiz_total || 0}</div>
+          <div className="text-green-300 text-xs">정답률 {stats?.today_quiz_score || 0}%</div>
         </div>
+        <div className="flex-1 min-w-[160px] bg-gradient-to-br from-yellow-400/40 to-orange-900/30 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <TrendingUp className="w-8 h-8 text-yellow-300 mb-2" />
+          <div className="text-lg font-bold text-yellow-100 mb-1">최고 연속 학습</div>
+          <div className="text-2xl font-extrabold text-yellow-200 mb-1 animate-pulse">{stats?.max_streak || 0}일</div>
+          <div className="text-yellow-300 text-xs">현재 streak {stats?.streak_days || 0}일</div>
+        </div>
+      </div>
+      {/* 동기부여 메시지 */}
+      <div className="w-full text-center mb-6">
+        <span className="inline-block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text text-xl font-extrabold drop-shadow animate-fade-in">오늘도 성장 중! 꾸준함이 실력입니다 💪</span>
       </div>
 
       {/* 기간별 학습 성장 그래프 - 완전히 새 고급 대시보드 스타일 */}
@@ -465,6 +484,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             <TrendingUp className="w-7 h-7 text-yellow-300" />
             기간별 학습 성장 그래프
           </h3>
+          {/* 그래프 위 요약 수치/메시지 */}
+          <div className="flex flex-wrap gap-4 mb-4 items-center justify-center text-base font-bold">
+            <span className="px-4 py-1 rounded-full bg-blue-900/40 text-blue-200">이번주 AI 달성률 {Math.round(percentChartData.slice(-7).reduce((a,b)=>a+b.ai_percent,0)/Math.min(percentChartData.slice(-7).length,7)) || 0}%</span>
+            <span className="px-4 py-1 rounded-full bg-pink-900/40 text-pink-200">이번주 용어 달성률 {Math.round(percentChartData.slice(-7).reduce((a,b)=>a+b.terms_percent,0)/Math.min(percentChartData.slice(-7).length,7)) || 0}%</span>
+            <span className="px-4 py-1 rounded-full bg-green-900/40 text-green-200">이번주 퀴즈 정답률 {Math.round(percentChartData.slice(-7).reduce((a,b)=>a+b.quiz_score,0)/Math.min(percentChartData.slice(-7).length,7)) || 0}%</span>
+          </div>
           <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-blue-400/30 scrollbar-track-transparent" style={{ height: 340 }}>
             <ResponsiveContainer width="100%" height={320}>
               <LineChart
@@ -579,7 +604,33 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             </ResponsiveContainer>
           </div>
         </div>
-      </section>
+      {/* 하단: 동기부여/성장 카드 */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 mt-10 justify-center items-stretch">
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-400/30 to-blue-900/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <TrendingUp className="w-8 h-8 text-blue-400 mb-2" />
+          <div className="text-lg font-bold text-blue-100 mb-1">최근 연속 학습</div>
+          <div className="text-2xl font-extrabold text-blue-200 mb-1 animate-pulse">{stats?.streak_days || 0}일</div>
+          <div className="text-blue-300 text-xs">최고 streak {stats?.max_streak || 0}일</div>
+        </div>
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-400/30 to-purple-900/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <FaBookOpen className="w-8 h-8 text-pink-400 mb-2" />
+          <div className="text-lg font-bold text-pink-100 mb-1">누적 용어 학습</div>
+          <div className="text-2xl font-extrabold text-pink-200 mb-1 animate-pulse">{stats?.total_terms_learned || 0}</div>
+          <div className="text-pink-300 text-xs">총 {stats?.total_terms_available || 0}개</div>
+        </div>
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-400/30 to-green-900/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <FaCheckCircle className="w-8 h-8 text-green-400 mb-2" />
+          <div className="text-lg font-bold text-green-100 mb-1">누적 퀴즈 정답</div>
+          <div className="text-2xl font-extrabold text-green-200 mb-1 animate-pulse">{stats?.cumulative_quiz_score || 0}%</div>
+          <div className="text-green-300 text-xs">오늘 정답률 {stats?.today_quiz_score || 0}%</div>
+        </div>
+        <div className="flex-1 min-w-[180px] bg-gradient-to-br from-yellow-400/30 to-orange-900/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
+          <TrendingUp className="w-8 h-8 text-yellow-300 mb-2" />
+          <div className="text-lg font-bold text-yellow-100 mb-1">다음 목표</div>
+          <div className="text-2xl font-extrabold text-yellow-200 mb-1 animate-pulse">7일 연속 달성</div>
+          <div className="text-yellow-300 text-xs">달성 시 뱃지 지급!</div>
+        </div>
+      </div>
     </div>
   )
 }
