@@ -444,36 +444,36 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         )}
       </div>
 
-      {/* 기간별 학습추이 - 완전히 새 고급 대시보드 스타일 */}
+      {/* 기간별 학습 성장 그래프 - 완전히 새 고급 대시보드 스타일 */}
       <section className="w-full max-w-5xl mx-auto mt-10 mb-16">
         {/* 상단 카드형 범례/설명 */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-8 justify-center items-stretch">
-          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-500/30 to-blue-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
-            <BarChart3 className="w-8 h-8 text-blue-400 mb-2" />
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-blue-600/40 to-blue-900/30 rounded-2xl shadow-2xl p-6 flex flex-col items-center border-0">
+            <BarChart3 className="w-9 h-9 text-blue-400 mb-2" />
             <div className="text-lg font-bold text-blue-100 mb-1">AI 정보 달성률</div>
-            <div className="text-2xl font-extrabold text-blue-200 mb-1">{todayData.ai_percent}%</div>
+            <div className="text-3xl font-extrabold text-blue-200 mb-1 animate-pulse">{todayData.ai_percent}%</div>
             <div className="text-blue-300 text-xs">(3개 중 달성률)</div>
           </div>
-          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-500/30 to-purple-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
-            <BookOpen className="w-8 h-8 text-pink-400 mb-2" />
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-pink-500/40 to-purple-900/30 rounded-2xl shadow-2xl p-6 flex flex-col items-center border-0">
+            <BookOpen className="w-9 h-9 text-pink-400 mb-2" />
             <div className="text-lg font-bold text-pink-100 mb-1">용어 달성률</div>
-            <div className="text-2xl font-extrabold text-pink-200 mb-1">{todayData.terms_percent}%</div>
+            <div className="text-3xl font-extrabold text-pink-200 mb-1 animate-pulse">{todayData.terms_percent}%</div>
             <div className="text-pink-300 text-xs">(60개 중 달성률)</div>
           </div>
-          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-500/30 to-green-800/20 rounded-2xl shadow-xl p-5 flex flex-col items-center border-0">
-            <FaCheckCircle className="w-8 h-8 text-green-400 mb-2" />
+          <div className="flex-1 min-w-[180px] bg-gradient-to-br from-green-500/40 to-green-900/30 rounded-2xl shadow-2xl p-6 flex flex-col items-center border-0">
+            <FaCheckCircle className="w-9 h-9 text-green-400 mb-2" />
             <div className="text-lg font-bold text-green-100 mb-1">퀴즈 정답률</div>
-            <div className="text-2xl font-extrabold text-green-200 mb-1">{todayData.quiz_score}%</div>
+            <div className="text-3xl font-extrabold text-green-200 mb-1 animate-pulse">{todayData.quiz_score}%</div>
             <div className="text-green-300 text-xs">(정답/총문제)</div>
           </div>
         </div>
         {/* 그래프 카드 */}
-        <div className="rounded-3xl shadow-2xl p-8 bg-gradient-to-br from-slate-900/80 via-purple-900/60 to-slate-900/80 border-0 flex flex-col items-center justify-center">
+        <div className="rounded-3xl shadow-2xl p-8 bg-gradient-to-br from-slate-900/90 via-purple-900/70 to-slate-900/90 border-0 flex flex-col items-center justify-center">
           <h3 className="text-2xl font-extrabold text-white mb-6 flex items-center gap-3 drop-shadow">
             <TrendingUp className="w-7 h-7 text-yellow-300" />
             기간별 학습 성장 그래프
           </h3>
-          <div className="w-full" style={{ height: 340 }}>
+          <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-blue-400/30 scrollbar-track-transparent" style={{ height: 340 }}>
             <ResponsiveContainer width="100%" height={320}>
               <LineChart
                 data={percentChartData}
@@ -481,29 +481,65 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               >
                 <defs>
                   <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                    <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
                     <feMerge>
                       <feMergeNode in="coloredBlur"/>
                       <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                   </filter>
                   <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.95}/>
+                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.98}/>
                     <stop offset="100%" stopColor="#6366f1" stopOpacity={0.18}/>
                   </linearGradient>
                   <linearGradient id="termsGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ec4899" stopOpacity={0.95}/>
+                    <stop offset="0%" stopColor="#ec4899" stopOpacity={0.98}/>
                     <stop offset="100%" stopColor="#ec4899" stopOpacity={0.18}/>
                   </linearGradient>
                   <linearGradient id="quizGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.95}/>
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.98}/>
                     <stop offset="100%" stopColor="#10b981" stopOpacity={0.18}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="2 8" stroke="#fff3" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={DateTick}
+                  tick={({ x, y, payload, index }) => {
+                    const d = new Date(payload.value);
+                    const month = d.getMonth() + 1;
+                    const day = d.getDate();
+                    const week = ['일','월','화','수','목','금','토'][d.getDay()];
+                    return (
+                      <g transform={`translate(${x},${y})`} key={payload.value + '-' + index}>
+                        <rect x={-22} y={8} width={44} height={28} rx={14} fill="#232946" opacity={0.85} />
+                        <text
+                          x={0}
+                          y={28}
+                          textAnchor="middle"
+                          fill="#e0e7ff"
+                          fontWeight={700}
+                          fontSize={15}
+                          style={{
+                            paintOrder: 'stroke',
+                            stroke: '#18181b',
+                            strokeWidth: 0.5,
+                            filter: 'drop-shadow(0 1px 2px #0006)'
+                          }}
+                        >
+                          {`${month}/${day}`}
+                        </text>
+                        <text
+                          x={0}
+                          y={44}
+                          textAnchor="middle"
+                          fill="#a5b4fc"
+                          fontWeight={600}
+                          fontSize={12}
+                        >
+                          {week}
+                        </text>
+                      </g>
+                    );
+                  }}
                   interval={0}
                   axisLine={{stroke:'#6366f1', strokeWidth:2}}
                   tickLine={false}
